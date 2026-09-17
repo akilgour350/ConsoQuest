@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consoquest-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: consoquest-api
+  template:
+    metadata:
+      labels:
+        app: consoquest-api
+    spec:
+      containers:
+        - name: consoquest-api
+          image: consoquest-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 18080

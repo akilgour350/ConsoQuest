@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: consoquest-api
+spec:
+  selector:
+    app: consoquest-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 18080
+  type: ClusterIP
