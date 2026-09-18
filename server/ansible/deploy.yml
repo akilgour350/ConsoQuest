@@ -1,0 +1,50 @@
+---
+- name: Deploy ConsoQuest API
+  hosts: localhost
+  connection: local
+  become: false
+
+  vars:
+    repo_path: /root/consoquest
+    image_name: consoquest-api
+    deployment_name: consoquest-api
+
+  tasks:
+    - name: Pull latest code
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ repo_path }}"
+        version: main
+        force: yes
+
+    - name: Build new Docker image
+      command: >
+        docker build -t {{ image_name }}:{{ build_number }}
+        -t {{ image_name }}:latest
+        {{ repo_path }}/server
+      register: build_result
+
+    - name: Import image into k3s
+      command: >
+        docker save {{ image_name }}:latest |
+        k3s ctr images import -
+      when: build_result is succeeded
+
+    - name: Restart k3s deployment
+      command: >
+        k3s kubectl rollout restart
+        deployment/{{ deployment_name }}
+      when: build_result is succeeded
+
+    - name: Wait for rollout to complete
+      command: >
+        k3s kubectl rollout status
+        deployment/{{ deployment_name }}
+        --timeout=120s
+      register: rollout_result
+
+    - name: Rollback if rollout failed
+      command: >
+        k3s kubectl rollout undo
+        deployment/{{ deployment_name }}
+      when: rollout_result is failed
