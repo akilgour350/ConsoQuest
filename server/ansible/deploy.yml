@@ -1,5 +1,5 @@
 ---
-- name: Deploy ConsoQuest API
+- name: Deploy ConsoQuest
   hosts: localhost
   connection: local
   become: false
