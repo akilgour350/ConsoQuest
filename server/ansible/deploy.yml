@@ -25,7 +25,7 @@
       register: build_result
 
     - name: Import image into k3s
-      command: >
+      shell: >
         docker save {{ image_name }}:latest |
         k3s ctr images import -
       when: build_result is succeeded
