@@ -12,7 +12,7 @@
   tasks:
     - name: Pull latest code
       git:
-        repo: "{{ repo_url }}"
+        repo: "https://oauth2:{{ gitlab_token }}@gitlab.com/codeyking350/consoquest.git"
         dest: "{{ repo_path }}"
         version: main
         force: yes
