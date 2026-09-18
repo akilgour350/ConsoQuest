@@ -24,6 +24,14 @@
         {{ repo_path }}/server
       register: build_result
 
+    - name: List Docker images
+      shell: docker images
+      register: images_list
+
+    - name: Show images
+      debug:
+        var: images_list.stdout_lines
+
     - name: Import image into k3s
       shell: >
         docker save {{ image_name }}:latest |
