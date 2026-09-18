@@ -11,7 +11,10 @@ pipeline {
 
         stage('Deploy') {
             when {
-                changeset "server/**"
+                anyOf {
+                    changeset "server/**"
+                    changeset "Jenkinsfile"
+                }                
             }
             steps {
                 sshagent(['consoquest-vm-ssh']) {
