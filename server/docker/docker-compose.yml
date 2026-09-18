@@ -9,13 +9,5 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
 
-  api:
-    image: consoquest-api
-    container_name: consoquest-api
-    ports:
-      - "18080:18080"
-    depends_on:
-      - postgres
-
 volumes:
   pgdata:
