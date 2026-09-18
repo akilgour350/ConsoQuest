@@ -10,27 +10,12 @@
     deployment_name: consoquest-api
 
   tasks:
-    - name: Pull latest code
-      git:
-        repo: "https://codeyking350:{{ gitlab_token }}@gitlab.jgraham.me/codeyking350/consoquest.git"
-        dest: "{{ repo_path }}"
-        version: main
-        force: yes
-
     - name: Build new Docker image
       command: >
         docker build -t {{ image_name }}:{{ build_number }}
         -t {{ image_name }}:latest
         {{ repo_path }}/server
       register: build_result
-
-    - name: List Docker images
-      shell: docker images
-      register: images_list
-
-    - name: Show images
-      debug:
-        var: images_list.stdout_lines
 
     - name: Import image into k3s
       shell: >

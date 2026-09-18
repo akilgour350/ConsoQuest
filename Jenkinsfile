@@ -17,11 +17,12 @@ pipeline {
                 sshagent(['consoquest-vm-ssh']) {
                     withCredentials([string(credentialsId: 'consoquest-gitlab-ansible', variable: 'GITLAB_TOKEN')]) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no root@10.10.10.4 \
+                            ssh -o StrictHostKeyChecking=no root@10.10.10.X \
+                            "cd /root/consoquest && git pull"
+                            
+                            ssh -o StrictHostKeyChecking=no root@10.10.10.X \
                             "ansible-playbook /root/consoquest/server/ansible/deploy.yml \
-                            -e repo_url=https://gitlab.jgraham.me/codeyking350/consoquest.git \
-                            -e build_number=${BUILD_NUMBER} \
-                            -e gitlab_token=${GITLAB_TOKEN}"
+                            -e build_number=${BUILD_NUMBER}"
                         '''
                     }
                 }
