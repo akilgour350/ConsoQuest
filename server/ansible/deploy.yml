@@ -35,13 +35,8 @@
       register: rollout_result
       failed_when: rollout_result.rc != 0
       ignore_errors: true
-      notify:
-        - get pod logs
-        - rollback deployment
-        - fail pipeline
 
-  handlers:
-    - name: get pod logs
+    - name: Get crashing pod logs
       shell: |
         POD=$(k3s kubectl get pods -l app={{ deployment_name }} --no-headers | awk 'NR==1{print $1}')
         k3s kubectl logs $POD --previous
@@ -49,11 +44,11 @@
       ignore_errors: true
       when: rollout_result is failed
 
-    - name: rollback deployment
+    - name: Rollback deployment
       shell: k3s kubectl rollout undo deployment/{{ deployment_name }}
       when: rollout_result is failed
 
-    - name: fail pipeline
+    - name: Fail pipeline
       fail:
         msg: "Deployment failed and was rolled back.\nPod logs:\n{{ pod_logs.stdout }}"
       when: rollout_result is failed
