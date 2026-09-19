@@ -21,9 +21,7 @@ RUN git clone https://github.com/jtv/libpqxx.git /opt/libpqxx && \
     cmake --install build
 
 # Build bcrypt
-RUN git clone https://github.com/hilch/Bcrypt.cpp.git /opt/bcrypt && \
-    cp /opt/bcrypt/include/bcrypt.h /usr/local/include/ && \
-    cp /opt/bcrypt/src/bcrypt.cpp /opt/bcrypt/src/blowfish.cpp /usr/local/src/
+RUN git clone https://github.com/hilch/Bcrypt.cpp.git /opt/bcrypt
 
 # Copy and build the API
 WORKDIR /app
@@ -31,10 +29,10 @@ COPY src/ .
 RUN g++ -std=c++20 -O2 \
     -DASIO_STANDALONE \
     -I/opt/crow/include \
-    -I/usr/local/include \
+    -I/opt/bcrypt/include \
     -o consoquest-api main.cpp \
-    /usr/local/src/bcrypt.cpp \
-    /usr/local/src/blowfish.cpp \
+    /opt/bcrypt/src/bcrypt.cpp \
+    /opt/bcrypt/src/blowfish.cpp \
     -lpthread -lpqxx -lpq
 
 # Run stage
