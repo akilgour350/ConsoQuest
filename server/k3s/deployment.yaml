@@ -4,6 +4,11 @@ metadata:
   name: consoquest-api
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: consoquest-api
@@ -24,3 +29,10 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: password
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 18080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3

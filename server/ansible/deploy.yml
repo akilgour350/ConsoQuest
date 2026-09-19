@@ -36,6 +36,14 @@
         k3s kubectl rollout status deployment/{{ deployment_name }} --timeout=120s
       register: rollout_result
 
+    - name: Wait for pods to stabilise
+      shell: |
+        sleep 15
+        k3s kubectl get pods -l app={{ deployment_name }} --no-headers | awk '{print $3}' | grep -v Running | grep -c .
+      register: bad_pods
+      failed_when: bad_pods.stdout | int > 0
+      when: rollout_result is succeeded
+
     - name: Rollback if rollout failed
       command: >
         k3s kubectl rollout undo deployment/{{ deployment_name }}
