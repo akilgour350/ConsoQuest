@@ -36,7 +36,7 @@
         k3s kubectl rollout status deployment/{{ deployment_name }} --timeout=120s
       register: rollout_result
 
-    - name: Wait for pods to stabilise
+    - name: Check for pods crashing after rollout
       shell: |
         sleep 15
         k3s kubectl get pods -l app={{ deployment_name }} --no-headers | awk '{print $3}' | grep -v Running | grep -c .
