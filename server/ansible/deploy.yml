@@ -12,9 +12,7 @@
   tasks:
     - name: Build new Docker image
       command: >
-        docker build -t {{ image_name }}:{{ build_number }}
-        -t {{ image_name }}:latest
-        {{ repo_path }}/server
+        docker build -t {{ image_name }}:{{ build_number }} -t {{ image_name }}:latest {{ repo_path }}/server
       register: build_result
 
     - name: Import image into k3s
@@ -24,24 +22,21 @@
       when: build_result is succeeded
 
     - name: Apply k3s manifests
-      shell: k3s kubectl apply -f {{ repo_path }}/server/k3s/
+      shell: >
+        k3s kubectl apply -f {{ repo_path }}/server/k3s/
       when: build_result is succeeded
 
     - name: Restart k3s deployment
       command: >
-        k3s kubectl rollout restart
-        deployment/{{ deployment_name }}
+        k3s kubectl rollout restart deployment/{{ deployment_name }}
       when: build_result is succeeded
 
     - name: Wait for rollout to complete
       command: >
-        k3s kubectl rollout status
-        deployment/{{ deployment_name }}
-        --timeout=120s
+        k3s kubectl rollout status deployment/{{ deployment_name }} --timeout=120s
       register: rollout_result
 
     - name: Rollback if rollout failed
       command: >
-        k3s kubectl rollout undo
-        deployment/{{ deployment_name }}
+        k3s kubectl rollout undo deployment/{{ deployment_name }}
       when: rollout_result is failed
