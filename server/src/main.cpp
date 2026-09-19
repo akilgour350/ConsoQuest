@@ -8,17 +8,18 @@ using namespace std;
 using namespace crow;
 using namespace pqxx;
 
-// our DB connection - vm must have an environment variable for the DB Password
-static connection conn("host=10.10.10.4 port=3005 dbname=postgres user=postgres password=" + string(getenv("DB_PASSWORD")));
-
 int main() {
     SimpleApp app;
+
+    // DB connection
+    // pointer should be passed to all methods requiring DB access
+    connection conn("host=10.10.10.4 port=3005 dbname=postgres user=postgres password=" + string(getenv("DB_PASSWORD")));
 
     CROW_ROUTE(app, "/status")([]() {
         return response(status::OK);
     });
 
-    CROW_ROUTE(app, "/register").methods(HTTPMethod::POST)([](const request& req) {
+    CROW_ROUTE(app, "/register").methods(HTTPMethod::POST)([&conn](const request& req) {
         auto body = json::load(req.body);
         if (!body)
             return response(400, "Invalid JSON");
@@ -61,7 +62,7 @@ int main() {
         }
     });
 
-    CROW_ROUTE(app, "/login")([](const request& req) {
+    CROW_ROUTE(app, "/login")([&conn](const request& req) {
         string auth = req.get_header_value("Authorization");
 
         // makes sure there is actually any auth credentials found, otherwise returns 401
