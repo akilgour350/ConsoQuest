@@ -14,7 +14,7 @@ int main() {
 
     // DB connection
     // pointer should be passed to all methods requiring DB access
-    connection conn("host=10.10.10.4 port=3005 dbname=postgres user=postgres password=" + string(getenv("DB_PASS")));
+    connection conn("host=10.10.10.4 port=3005 dbname=postgres user=postgres password=" + string(getenv("DB_PASSWORD")));
 
     CROW_ROUTE(app, "/status")([]() {
         return response(status::OK);
