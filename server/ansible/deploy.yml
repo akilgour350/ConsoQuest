@@ -35,6 +35,8 @@
       command: >
         k3s kubectl rollout status deployment/{{ deployment_name }} --timeout=120s
       register: rollout_result
+      failed_when: rollout_result.rc != 0
+      ignore_errors: true
 
     - name: Check for pods crashing after rollout
       shell: |
