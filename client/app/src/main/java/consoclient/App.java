@@ -1,4 +1,4 @@
-package client;
+package consoclient;
 
 import java.util.Scanner;
 
@@ -26,7 +26,7 @@ public class App {
             System.out.println("0: Exit");
 
             try {
-                System.out.print(Colours.FOND_GREEN + "Pick an option: " + Colours.FONT_RESET);
+                System.out.print(Colours.FONT_GREEN + "Pick an option: " + Colours.FONT_RESET);
                 input = scanner.nextInt();
 
                 if (input >= 0 && input <= 2) {
@@ -38,6 +38,7 @@ public class App {
             }
         } while (!validInput);
 
+        scanner.close();
         System.out.println("You picked: " + input);
     }
 }

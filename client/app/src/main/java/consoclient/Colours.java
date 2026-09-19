@@ -1,12 +1,12 @@
-package client;
+package consoclient;
 
-// defines various colours that can be used in the console by just inserting the string values
+/// Various colour strings for use in console output
 public final class Colours {
     // FONT COLOURS
     public static final String FONT_RESET = "\u001B[0m";
     public static final String FONT_BLACK = "\u001B[30m";
     public static final String FONT_RED = "\u001B[31m";
-    public static final String FOND_GREEN = "\u001B[32m";
+    public static final String FONT_GREEN = "\u001B[32m";
     public static final String FONT_YELLOW = "\u001B[33m";
     public static final String FONT_BLUE = "\u001B[34m";
     public static final String FONT_PURPLE = "\u001B[35m";
