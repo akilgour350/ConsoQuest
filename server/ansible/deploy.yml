@@ -12,8 +12,8 @@
   tasks:
     - name: Build new Docker image
       command: >
-        docker build -t {{ image_name }}:{{ build_number }} -t {{ image_name }}:latest {{ repo_path }}/server
-      register: build_result
+        docker build -t {{ image_name }}:{{ build_number }}
+        {{ repo_path }}/server
 
     - name: Import image into k3s
       shell: >
@@ -21,31 +21,35 @@
         k3s ctr images import -
 
     - name: Apply k3s manifests
-      shell: >
-        k3s kubectl apply -f {{ repo_path }}/server/k3s/
-      when: build_result is succeeded
+      shell: k3s kubectl apply -f {{ repo_path }}/server/k3s/
 
     - name: Update deployment image
       shell: >
-        k3s kubectl set image deployment/{{ deployment_name }} {{ deployment_name }}={{ image_name }}:{{ build_number }}
-      when: build_result is succeeded
+        k3s kubectl set image deployment/{{ deployment_name }}
+        {{ deployment_name }}={{ image_name }}:{{ build_number }}
 
     - name: Wait for rollout to complete
-      command: >
-        k3s kubectl rollout status deployment/{{ deployment_name }} --timeout=120s
+      shell: >
+        k3s kubectl rollout status deployment/{{ deployment_name }}
+        --timeout=130s
       register: rollout_result
       failed_when: rollout_result.rc != 0
       ignore_errors: true
 
-    - name: Check for pods crashing after rollout
-      shell: |
-        sleep 15
-        k3s kubectl get pods -l app={{ deployment_name }} --no-headers | awk '{print $3}' | grep -v Running | grep -c .
-      register: bad_pods
-      failed_when: bad_pods.stdout | int > 0
-      when: rollout_result is succeeded
+  handlers:
+    - name: handle rollback
+      listen: rollback
+      block:
+        - name: Get crashing pod logs
+          shell: |
+            POD=$(k3s kubectl get pods -l app={{ deployment_name }} --no-headers | awk 'NR==1{print $1}')
+            k3s kubectl logs $POD --previous
+          register: pod_logs
+          ignore_errors: true
 
-    - name: Rollback if rollout failed
-      command: >
-        k3s kubectl rollout undo deployment/{{ deployment_name }}
-      when: rollout_result is failed
+        - name: Rollback deployment
+          shell: k3s kubectl rollout undo deployment/{{ deployment_name }}
+
+        - name: Fail pipeline
+          fail:
+            msg: "Deployment failed and was rolled back.\nPod logs:\n{{ pod_logs.stdout }}"
