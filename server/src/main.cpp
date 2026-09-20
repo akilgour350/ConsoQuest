@@ -13,7 +13,7 @@ int main() {
     SimpleApp app;
 
     // tests to make sure we can actually retrieve the database password
-    string dbPwd = string(getenv("DB_PASSWORD"));
+    string dbPwd = string(getenv("DB_PASS"));
     if (dbPwd.empty()) {
         cerr << "FATAL: Could not retrieve database password" << endl;
         return 1;
