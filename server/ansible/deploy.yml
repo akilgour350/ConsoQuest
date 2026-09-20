@@ -28,13 +28,16 @@
     - name: Wait for rollout to complete
       shell: >
         k3s kubectl rollout status deployment/{{ deployment_name }}
-        --timeout=70s
+        --timeout=60s
       register: rollout_result
       failed_when: rollout_result.rc != 0
       ignore_errors: true
 
     - name: Rollback deployment
       shell: k3s kubectl rollout undo deployment/{{ deployment_name }}
+      when: rollout_result is failed
+
+    - name: Fail pipeline
       fail:
-        msg: "Deployment failed and was rolled back"
+        msg: "Deployment failed and was rolled back.\nPod logs:\n{{ pod_logs.stdout }}"
       when: rollout_result is failed
