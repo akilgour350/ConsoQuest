@@ -20,9 +20,6 @@
         docker save {{ image_name }}:{{ build_number }} |
         k3s ctr images import -
 
-    - name: Apply k3s manifests
-      shell: k3s kubectl apply -f {{ repo_path }}/server/k3s/
-
     - name: Update deployment image
       shell: >
         k3s kubectl set image deployment/{{ deployment_name }}

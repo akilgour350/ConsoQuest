@@ -4,6 +4,12 @@ metadata:
   name: consoquest-api
 spec:
   replicas: 2
+  progressDeadlineSeconds: 120
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: consoquest-api
@@ -14,7 +20,7 @@ spec:
     spec:
       containers:
         - name: consoquest-api
-          image: consoquest-api:latest
+          image: consoquest-api:0
           imagePullPolicy: Never
           ports:
             - containerPort: 18080
@@ -24,3 +30,17 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: password
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 18080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 18080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
