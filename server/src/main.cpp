@@ -3,11 +3,40 @@
 #include "crow.h"
 #include <pqxx/pqxx>
 #include "bcrypt.h"
+#include "jwt-cpp/jwt.h"
 
 using namespace std;
 using namespace crow;
 using namespace pqxx;
 
+auto generateJwt(string username, string jwtSecret) {
+    return jwt::create<jwt::traits::kazuho_picojson>()
+        .set_issuer("consoquest")
+        .set_subject(username)
+        .set_issued_at(std::chrono::system_clock::now())
+        .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours(24))
+        .sign(jwt::algorithm::hs256{jwtSecret});
+}
+
+bool verifyToken(const string& token, const string& secret) {
+    try {
+        auto decoded = jwt::decode<jwt::traits::kazuho_picojson>(token);
+
+        auto verifier = jwt::verify<jwt::traits::kazuho_picojson>()
+            .allow_algorithm(jwt::algorithm::hs256{secret})
+            .with_issuer("consoquest");
+
+        verifier.verify(decoded);
+        return true;
+    } catch (const exception& e) {
+        return false;
+    }
+}
+
+string getUsernameFromToken(const string& token) {
+    auto decoded = jwt::decode<jwt::traits::kazuho_picojson>(token);
+    return decoded.get_subject();
+}
 
 int main() {
     SimpleApp app;
@@ -16,6 +45,13 @@ int main() {
     string dbPwd = string(getenv("DB_PASSWORD"));
     if (dbPwd.empty()) {
         cerr << "FATAL: Could not retrieve database password" << endl;
+        return 1;
+    }
+
+    // tests to make sure we can actually retrieve the JWT secret
+    string jwtSecret = string(getenv("DB_PASSWORD"));
+    if (dbPwd.empty()) {
+        cerr << "FATAL: Could not retrieve JWT secret" << endl;
         return 1;
     }
 
@@ -34,7 +70,7 @@ int main() {
             return response(status::OK);
         });
 
-        CROW_ROUTE(app, "/register").methods(HTTPMethod::POST)([&conn](const request& req) {
+        CROW_ROUTE(app, "/register").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req) {
             auto body = json::load(req.body);
             if (!body)
                 return response(400, "Invalid JSON");
@@ -69,6 +105,7 @@ int main() {
                 json::wvalue res;
                 res["success"] = true;
                 res["username"] = username;
+                res["token"] = generateJwt(username, jwtSecret);
                 return response(201, res);
 
             } catch (const exception& e) {
@@ -76,7 +113,7 @@ int main() {
             }
         });
 
-        CROW_ROUTE(app, "/login")([&conn](const request& req) {
+        CROW_ROUTE(app, "/login")([&conn, &jwtSecret](const request& req) {
             string auth = req.get_header_value("Authorization");
 
             // makes sure there is actually any auth credentials found, otherwise returns 401
@@ -117,8 +154,9 @@ int main() {
                     json::wvalue response;
                     response["verified"] = true;
                     response["message"] = "Success";
-                    //response["xcoord"]   = result[0]["xcoord"].as<int>();
-                    //response["ycoord"]   = result[0]["ycoord"].as<int>();
+                    response["token"] = generateJwt(username, jwtSecret);
+                    response["xcoord"]   = result[0]["xcoord"].as<int>();
+                    response["ycoord"]   = result[0]["ycoord"].as<int>();
 
                     return crow::response(200, response);
                 } else {
@@ -136,6 +174,23 @@ int main() {
 
             // if we got here, the user isn't authorised and 401 is returned
             return response(401, "Invalid credentials");
+        });
+
+        CROW_ROUTE(app, "/protected")([&jwtSecret](const request& req) {
+            string auth = req.get_header_value("Authorization");
+            if (auth.empty() || auth.substr(0, 7) != "Bearer ")
+                return response(401, "No token provided");
+
+            string token = auth.substr(7);
+
+            if (!verifyToken(token, jwtSecret))
+                return response(401, "Invalid or expired token");
+
+            string username = getUsernameFromToken(token);
+
+            json::wvalue res;
+            res["username"] = username;
+            return response(200, res);
         });
 
         app.port(18080).run();

@@ -1,8 +1,7 @@
 package consoclient;
 
 public class Player {
-    public int id;
     public String username;
-    public String passwordHash;
-
+    public int xcoord;
+    public int ycoord;
 }
