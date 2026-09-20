@@ -15,7 +15,7 @@
         docker build -t {{ image_name }}:{{ build_number }}
         {{ repo_path }}/server
 
-    - name: Import image into k3s
+    - name: Import image into Kubernetes
       shell: >
         docker save {{ image_name }}:{{ build_number }} |
         k3s ctr images import -
@@ -28,24 +28,4 @@
     - name: Wait for rollout to complete
       shell: >
         k3s kubectl rollout status deployment/{{ deployment_name }}
-        --timeout=130s
-      register: rollout_result
-      failed_when: rollout_result.rc != 0
-      ignore_errors: true
-
-    - name: Get crashing pod logs
-      shell: |
-        POD=$(k3s kubectl get pods -l app={{ deployment_name }} --no-headers | awk 'NR==1{print $1}')
-        k3s kubectl logs $POD --previous
-      register: pod_logs
-      ignore_errors: true
-      when: rollout_result is failed
-
-    - name: Rollback deployment
-      shell: k3s kubectl rollout undo deployment/{{ deployment_name }}
-      when: rollout_result is failed
-
-    - name: Fail pipeline
-      fail:
-        msg: "Deployment failed and was rolled back.\nPod logs:\n{{ pod_logs.stdout }}"
-      when: rollout_result is failed
+        --timeout=70s

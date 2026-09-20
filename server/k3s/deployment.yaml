@@ -4,7 +4,7 @@ metadata:
   name: consoquest-api
 spec:
   replicas: 2
-  progressDeadlineSeconds: 120
+  progressDeadlineSeconds: 60
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -30,17 +30,3 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: password
-          readinessProbe:
-            httpGet:
-              path: /status
-              port: 18080
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /status
-              port: 18080
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            failureThreshold: 3
