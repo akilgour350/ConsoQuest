@@ -39,5 +39,5 @@
 
     - name: Fail pipeline
       fail:
-        msg: "Deployment failed and was rolled back.\nPod logs:\n{{ pod_logs.stdout }}"
+        msg: "Deployment failed and was rolled back."
       when: rollout_result is failed
