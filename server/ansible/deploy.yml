@@ -15,7 +15,7 @@
         docker build -t {{ image_name }}:{{ build_number }}
         {{ repo_path }}/server
 
-    - name: Import image into Kubernetes
+    - name: Import image into k3s
       shell: >
         docker save {{ image_name }}:{{ build_number }} |
         k3s ctr images import -
@@ -29,3 +29,12 @@
       shell: >
         k3s kubectl rollout status deployment/{{ deployment_name }}
         --timeout=70s
+      register: rollout_result
+      failed_when: rollout_result.rc != 0
+      ignore_errors: true
+
+    - name: Rollback deployment
+      shell: k3s kubectl rollout undo deployment/{{ deployment_name }}
+      fail:
+        msg: "Deployment failed and was rolled back"
+      when: rollout_result is failed
