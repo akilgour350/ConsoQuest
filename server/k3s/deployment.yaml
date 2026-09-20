@@ -4,7 +4,6 @@ metadata:
   name: consoquest-api
 spec:
   replicas: 2
-  progressDeadlineSeconds: 60
   strategy:
     type: RollingUpdate
     rollingUpdate:
