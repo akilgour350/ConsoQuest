@@ -9,15 +9,17 @@ using namespace std;
 using namespace crow;
 using namespace pqxx;
 
+/// Generates and returns a JWT access token with the given secret and username
 auto generateJwt(string username, string jwtSecret) {
     return jwt::create<jwt::traits::kazuho_picojson>()
         .set_issuer("consoquest")
         .set_subject(username)
         .set_issued_at(std::chrono::system_clock::now())
-        .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours(24))
+        .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours(1))
         .sign(jwt::algorithm::hs256{jwtSecret});
 }
 
+/// Checks if a given JWT token is valid
 bool verifyToken(const string& token, const string& secret) {
     try {
         auto decoded = jwt::decode<jwt::traits::kazuho_picojson>(token);
@@ -33,6 +35,7 @@ bool verifyToken(const string& token, const string& secret) {
     }
 }
 
+/// retrieves a user's username from the token for use in database
 string getUsernameFromToken(const string& token) {
     auto decoded = jwt::decode<jwt::traits::kazuho_picojson>(token);
     return decoded.get_subject();
@@ -174,23 +177,6 @@ int main() {
 
             // if we got here, the user isn't authorised and 401 is returned
             return response(401, "Invalid credentials");
-        });
-
-        CROW_ROUTE(app, "/protected")([&jwtSecret](const request& req) {
-            string auth = req.get_header_value("Authorization");
-            if (auth.empty() || auth.substr(0, 7) != "Bearer ")
-                return response(401, "No token provided");
-
-            string token = auth.substr(7);
-
-            if (!verifyToken(token, jwtSecret))
-                return response(401, "Invalid or expired token");
-
-            string username = getUsernameFromToken(token);
-
-            json::wvalue res;
-            res["username"] = username;
-            return response(200, res);
         });
 
         app.port(18080).run();

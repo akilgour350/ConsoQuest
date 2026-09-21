@@ -1,4 +1,4 @@
-package consoclient;
+package consoclient.data;
 
 import java.util.Random;
 

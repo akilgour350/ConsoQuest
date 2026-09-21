@@ -1,4 +1,4 @@
-package consoclient;
+package consoclient.data;
 
 public class Player {
     public String username;

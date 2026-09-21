@@ -1,6 +1,12 @@
+# Ignore Docker environment variables file for security
 server/docker/.env
+
+# Ignore IDE configs
 client/.idea
 server/src/.idea
+.vscode
+
+# Ignore basically everything in the 
 server/src/bcrypt.h
 server/src/bcrypt.cpp
 server/src/blowfish.cpp

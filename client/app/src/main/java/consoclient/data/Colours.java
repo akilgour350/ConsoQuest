@@ -1,4 +1,4 @@
-package consoclient;
+package consoclient.data;
 
 /// Various colour strings for use in console output
 public final class Colours {
@@ -12,6 +12,7 @@ public final class Colours {
     public static final String FONT_PURPLE = "\u001B[35m";
     public static final String FONT_CYAN = "\u001B[36m";
     public static final String FONT_WHITE = "\u001B[37m";
+    public static final String FONT_GREY = "\u001B[90m";
 
 
     // BACKGROUND COLOURS
