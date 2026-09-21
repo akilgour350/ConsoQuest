@@ -81,4 +81,12 @@ public class CosmeticOutputs {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
+
+    public void pause(int time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }
