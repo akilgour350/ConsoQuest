@@ -12,9 +12,13 @@
   tasks:
     - name: Apply Liquibase migrations
       shell: |
-        cd {{ repo_path }}/server/liquibase
-        DB_PASSWORD=$(k3s kubectl get secret db-credentials -o jsonpath='{.data.password}' | base64 -d) \
-        liquibase --defaultsFile=liquibase.properties update
+        DB_PWD=$(k3s kubectl get secret db-credentials -o jsonpath='{.data.password}' | base64 -d)
+        liquibase \
+          --url=jdbc:postgresql://localhost:3005/consodb \
+          --username=postgres \
+          --password=$DB_PWD \
+          --changeLogFile={{ repo_path }}/server/liquibase/changelog.xml \
+          update
       register: liquibase_result
 
     - name: Fail if migrations failed
