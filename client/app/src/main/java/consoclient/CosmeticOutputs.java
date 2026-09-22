@@ -82,11 +82,25 @@ public class CosmeticOutputs {
         System.out.flush();
     }
 
+    /// Pauses the execution for the given number of milliseconds
+    /// @param time pause time in milliseconds
     public void pause(int time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    /// prints the game's title to the console
+    /// credits to [here](https://patorjk.com/software/taag/#p=display&f=Doom&t=ConsoQuest&x=none&v=4&h=4&w=80&we=false) for the design
+    public void showGameName() {
+        System.out.println(" _____                       _____                 _   ");
+        System.out.println("/  __ \\                     |  _  |               | |  ");
+        System.out.println("| /  \\/ ___  _ __  ___  ___ | | | |_   _  ___  ___| |_ ");
+        System.out.println("| |    / _ \\| '_ \\/ __|/ _ \\| | | | | | |/ _ \\/ __| __|");
+        System.out.println("| \\__/\\ (_) | | | \\__ \\ (_) \\ \\/' / |_| |  __/\\__ \\ |_");
+        System.out.println(" \\____/\\___/|_| |_|___/\\___/ \\_/\\_\\\\__,_|\\___||___/\\__|");
+        System.out.println("\n");
     }
 }

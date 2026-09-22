@@ -10,6 +10,18 @@
     deployment_name: consoquest-api
 
   tasks:
+    - name: Apply Liquibase migrations
+      shell: |
+        cd {{ repo_path }}/server/liquibase
+        DB_PASSWORD=$(k3s kubectl get secret db-credentials -o jsonpath='{.data.password}' | base64 -d) \
+        liquibase --defaultsFile=liquibase.properties update
+      register: liquibase_result
+
+    - name: Fail if migrations failed
+      fail:
+        msg: "Liquibase migrations failed:\n{{ liquibase_result.stderr }}"
+      when: liquibase_result.rc != 0
+
     - name: Build new Docker image
       command: >
         docker build -t {{ image_name }}:{{ build_number }}

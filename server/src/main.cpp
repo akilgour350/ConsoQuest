@@ -106,7 +106,6 @@ int main() {
                 transaction.commit();
 
                 json::wvalue res;
-                res["success"] = true;
                 res["username"] = username;
                 res["token"] = generateJwt(username, jwtSecret);
                 return response(201, res);
@@ -177,6 +176,13 @@ int main() {
 
             // if we got here, the user isn't authorised and 401 is returned
             return response(401, "Invalid credentials");
+        });
+
+        CROW_ROUTE(app, "/game/new")([&conn, &jwtSecret](const request& req) {
+            
+
+
+            return response(501, "Not impelemented");
         });
 
         app.port(18080).run();
