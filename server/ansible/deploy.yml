@@ -13,11 +13,13 @@
     - name: Apply Liquibase migrations
       shell: |
         DB_PWD=$(k3s kubectl get secret db-credentials -o jsonpath='{.data.password}' | base64 -d)
+        cd {{ repo_path }}/server/liquibase
         liquibase \
           --url=jdbc:postgresql://localhost:3005/consodb \
           --username=postgres \
           --password=$DB_PWD \
-          --changeLogFile={{ repo_path }}/server/liquibase/changelog.xml \
+          --searchPath={{ repo_path }}/server/liquibase \
+          --changeLogFile=changelog.xml \
           update
       register: liquibase_result
 
