@@ -33,12 +33,11 @@ RUN g++ -std=c++20 -O2 \
     -DASIO_STANDALONE \
     -I/opt/crow/include \
     -I/opt/bcrypt/include \
-    -o consoquest-api main.cpp \
+    -I/opt/jwt-cpp/include \
+    -o consoquest-api main.cpp WorldGen.cpp \
     /opt/bcrypt/src/bcrypt.cpp \
     /opt/bcrypt/src/blowfish.cpp \
-    -lpthread -lpqxx -lpq \
-    -I/opt/jwt-cpp/include \
-    -lssl -lcrypto
+    -lpthread -lpqxx -lpq -lssl -lcrypto
 
 # Run stage
 FROM alpine:latest
