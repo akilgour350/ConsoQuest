@@ -2,47 +2,94 @@
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
     <changeSet id="1" author="alastair">
         <createTable tableName="players">
             <column name="username" type="VARCHAR(50)">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="password_hash" type="VARCHAR(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
-            <column name="xcoord" type="INT" defaultValueNumeric="0"/>
-            <column name="ycoord" type="INT" defaultValueNumeric="0"/>
+            <column name="xcoord" type="INT" defaultValueNumeric="0" />
+            <column name="ycoord" type="INT" defaultValueNumeric="0" />
         </createTable>
     </changeSet>
 
     <changeSet id="2" author="alastair">
         <createTable tableName="players">
             <column name="username" type="VARCHAR(50)">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="password_hash" type="VARCHAR(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
-            <column name="xcoord" type="INT" defaultValueNumeric="0"/>
-            <column name="ycoord" type="INT" defaultValueNumeric="0"/>
+            <column name="xcoord" type="INT" defaultValueNumeric="0" />
+            <column name="ycoord" type="INT" defaultValueNumeric="0" />
         </createTable>
 
         <createTable tableName="tiles">
             <column name="x" type="INT">
-                <constraints nullable="false" primaryKey="true"/>
+                <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="y" type="INT">
-                <constraints nullable="false" primaryKey="true"/>
+                <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="biome" type="VARCHAR(50)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
-            <column name="structure" type="VARCHAR(50)"/>
-            <column name="structure_cleared" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="structure" type="VARCHAR(50)" />
+            <column name="structure_cleared" type="BOOLEAN" defaultValueBoolean="false" />
         </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="alastair">
+        <!-- Remove the no longer needed structure_cleared column -->
+        <dropColumn tableName="tiles" columnName="structure_cleared" />
+        
+        <!-- Change the structure columns default value and nullability -->
+        <dropColumn tableName="tiles" columnName="structure" />
+        <addColumn tableName="tiles">
+            <column name="structure" type="VARCHAR(50)" defaultValue="NONE">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+
+        <!-- Player Sturcture instances -->
+        <createTable tableName="player_structures">
+            <column name="x" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="y" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="username" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="cleared_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+            tableName="player_structures"
+            columnNames="x, y, username"
+            constraintName="pk_player_structures" />
+
+        <addForeignKeyConstraint
+            baseTableName="player_structures"
+            baseColumnNames="x, y"
+            referencedTableName="tiles"
+            referencedColumnNames="x, y"
+            constraintName="fk_player_structure_structure" />
+
+        <addForeignKeyConstraint
+            baseTableName="player_structures"
+            baseColumnNames="username"
+            referencedTableName="players"
+            referencedColumnNames="username"
+            constraintName="fk_player_structure_player" />
     </changeSet>
 
 

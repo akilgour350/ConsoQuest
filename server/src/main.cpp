@@ -204,34 +204,43 @@ int main() {
 
                     work createNewTileTransaction(conn);
                     createNewTileTransaction.exec(
-                        "INSERT INTO tiles (x, y, biome, structure, structure_cleared) "
-                        "VALUES ($1, $2, $3, $4, $5)",
-                        params(xcoord, ycoord, WorldGen::biomeToString(tile.biome), tile.structure, tile.structure_cleared)
+                        "INSERT INTO tiles (x, y, biome, structure) "
+                        "VALUES ($1, $2, $3, $4)",
+                        params(xcoord, ycoord, WorldGen::biomeToString(tile.biome), tile.structure)
                     );
                     createNewTileTransaction.commit();
 
+                    // package up the tile into JSON and send it on its way
                     json::wvalue res;
                     res["x"] = xcoord;
                     res["y"] = ycoord;
                     res["biome"] = WorldGen::biomeToString(tile.biome);
                     res["structure"] = tile.structure;
-                    res["structure_cleared"] = tile.structure_cleared;
+                    res["structure_cleared"] = false;
+                    res["token"] = generateJwt(username, jwtSecret); // we always generate a new token when a request is received; they have short lifespans
                     return response(200, res);
-
                 }
 
-                // if a matching tile was found, just send it straight back
+                // structure completion check
+                work checkClearedTransaction(conn);
+                auto clearedResult = checkClearedTransaction.exec(
+                    "SELECT * FROM player_structures WHERE x = $1 AND y = $2 AND username = $3",
+                    params(xcoord, ycoord, username)
+                );
+                checkClearedTransaction.commit();
+
+                // package everything up and send it home with a JWT bow on top
                 json::wvalue res;
                 res["x"] = xcoord;
                 res["y"] = ycoord;
                 res["biome"] = dbTile[0]["biome"].as<string>();
-                res["structure"] = dbTile[0]["structure"].is_null() ? "" : dbTile[0]["structure"].as<string>();
-                res["structure_cleared"] = dbTile[0]["structure_cleared"].as<bool>();
+                res["structure"] = dbTile[0]["structure"].is_null() ? "NONE" : dbTile[0]["structure"].as<string>();
+                res["structure_cleared"] = !clearedResult.empty();
+                res["token"] = generateJwt(username, jwtSecret); // we always generate a new token when a request is received; they have short lifespans. like fruit flies.
                 return response(200, res);
 
-            } else {
-                return response(403, "Invalid credentials");
             }
+            return response(403, "Invalid credentials");
         });
 
         app.port(18080).run();

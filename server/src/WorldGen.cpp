@@ -97,11 +97,11 @@ string WorldGen::generateStructure(Biome biome, int x, int y) {
             case Biome::JUNGLE:       return "DUNGEON";
             case Biome::SNOWY_PLAINS: return "RUINS";
             case Biome::SNOWY_FOREST: return "CAVE";
-            case Biome::SWAMP:        return "RUINS";
-            default:                  return "";
+            case Biome::SWAMP:        return "CAVE";
+            default:                  return "NONE";
         }
     }
-    return "";
+    return "NONE";
 }
 
 string WorldGen::biomeToString(Biome biome) {
