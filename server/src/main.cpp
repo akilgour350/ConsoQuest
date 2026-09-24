@@ -174,39 +174,41 @@ int main() {
         });
 
         // retrieves or generates a tile at the given X and Y coordinates
-        CROW_ROUTE(app, "/tile").methods(HTTPMethod::POST)([&conn, &jwtSecret, &worldGen](const request& req) {
+        CROW_ROUTE(app, "/tile/get").methods(HTTPMethod::POST)([&conn, &jwtSecret, &worldGen](const request& req) {
             string token = req.get_header_value("Authorization").substr(7); // checks the given JWT token is valid
 
             if (verifyToken(token, jwtSecret)) { // only executes if the given JWT is valid
                 string username = getUsernameFromToken(token);
 
                 auto body = json::load(req.body);
-                int xcoord = static_cast<int>(body["xcoord"].i());;
-                int ycoord = static_cast<int>(body["ycoord"].i());;
+                int xcoord = static_cast<int>(body["xcoord"].i());
+                int ycoord = static_cast<int>(body["ycoord"].i());
 
-                work transaction(conn);
-                transaction.exec(
+                work setPlayerCoordsTransaction(conn);
+                setPlayerCoordsTransaction.exec(
                     "UPDATE players SET xcoord = $1, ycoord = $2 WHERE username = $3",
                     params(xcoord, ycoord, username)
                 );
-                transaction.commit();
+                setPlayerCoordsTransaction.commit();
 
                 // looks to see if the tile exists in the database
-                auto dbTile = transaction.exec(
+                work getExistingTileTransaction(conn);
+                auto dbTile = getExistingTileTransaction.exec(
                     "SELECT * FROM tiles WHERE x = $1 AND y = $2", params(xcoord, ycoord)
                 );
-                transaction.commit();
+                getExistingTileTransaction.commit();
 
                 if (dbTile.empty()) { // checks if a matching tile was found
                     // if no tile was found, generate a new one, store it, and send it back
                     Tile tile = worldGen.generateTile(xcoord, ycoord);
 
-                    transaction.exec(
+                    work createNewTileTransaction(conn);
+                    createNewTileTransaction.exec(
                         "INSERT INTO tiles (x, y, biome, structure, structure_cleared) "
                         "VALUES ($1, $2, $3, $4, $5)",
-                        params(xcoord, ycoord, tile.biome, tile.structure, tile.structure_cleared)
+                        params(xcoord, ycoord, WorldGen::biomeToString(tile.biome), tile.structure, tile.structure_cleared)
                     );
-                    transaction.commit();
+                    createNewTileTransaction.commit();
 
                     json::wvalue res;
                     res["x"] = xcoord;
@@ -216,18 +218,16 @@ int main() {
                     res["structure_cleared"] = tile.structure_cleared;
                     return response(200, res);
 
-                } else {
-                    // if a matching tile was found, just send it straight back
-                    json::wvalue res;
-                    res["x"] = xcoord;
-                    res["y"] = ycoord;
-                    res["biome"] = WorldGen::biomeToString(dbTile[0]["biome"].as<Biome>());
-                    res["structure"] = dbTile[0]["structure"].as<string>();
-                    res["structure_cleared"] = dbTile[0]["structure_cleared"].as<bool>();
-                    return response(200, res);
                 }
 
-                return response(500, "Internal error");
+                // if a matching tile was found, just send it straight back
+                json::wvalue res;
+                res["x"] = xcoord;
+                res["y"] = ycoord;
+                res["biome"] = dbTile[0]["biome"].as<string>();
+                res["structure"] = dbTile[0]["structure"].is_null() ? "" : dbTile[0]["structure"].as<string>();
+                res["structure_cleared"] = dbTile[0]["structure_cleared"].as<bool>();
+                return response(200, res);
 
             } else {
                 return response(403, "Invalid credentials");
