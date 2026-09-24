@@ -55,19 +55,29 @@ float WorldGen::fbm(float x, float y, int seed, int octaves, float persistence, 
 
 Biome WorldGen::getBiome(float elevation, float temperature, float moisture) {
     if (elevation < 0.35f) return Biome::OCEAN;
-    if (elevation < 0.4f)  return Biome::BEACH;
+    if (elevation < 0.4f)  return Biome::COAST;
 
     if (elevation > 0.75f) {
-        if (temperature < 0.3f) return Biome::SNOW;
-        return Biome::MOUNTAIN;
+        if (temperature < 0.3f) return Biome::SNOWY_HILLS;
+        return Biome::MOUNTAINS;
     }
 
-    if (temperature < 0.2f) return Biome::TUNDRA;
+    if (elevation > 0.55f) {
+        if (temperature < 0.3f) return Biome::SNOWY_HILLS;
+        return Biome::HILLS;
+    }
+
+    if (temperature < 0.2f) {
+        if (moisture > 0.5f) return Biome::SNOWY_FOREST;
+        return Biome::SNOWY_PLAINS;
+    }
 
     if (moisture > 0.6f) {
         if (temperature > 0.65f) return Biome::JUNGLE;
         return Biome::FOREST;
     }
+
+    if (moisture > 0.4f && moisture < 0.6f && temperature < 0.4f) return Biome::SWAMP;
 
     if (moisture < 0.3f) return Biome::DESERT;
 
@@ -79,13 +89,16 @@ string WorldGen::generateStructure(Biome biome, int x, int y) {
 
     if (roll > 0.92f) {
         switch (biome) {
-            case Biome::MOUNTAINS: return "CAVE";
-            case Biome::FOREST:   return roll > 0.96f ? "DUNGEON" : "RUINS";
-            case Biome::PLAINS:   return "VILLAGE";
-            case Biome::DESERT:   return "RUINS";
-            case Biome::JUNGLE:   return "DUNGEON";
-            case Biome::HILLS:   return "CAVE";
-            default:              return "";
+            case Biome::MOUNTAINS:    return "CAVE";
+            case Biome::HILLS:        return "CAVE";
+            case Biome::FOREST:       return roll > 0.96f ? "DUNGEON" : "RUINS";
+            case Biome::PLAINS:       return "VILLAGE";
+            case Biome::DESERT:       return "RUINS";
+            case Biome::JUNGLE:       return "DUNGEON";
+            case Biome::SNOWY_PLAINS: return "RUINS";
+            case Biome::SNOWY_FOREST: return "CAVE";
+            case Biome::SWAMP:        return "RUINS";
+            default:                  return "";
         }
     }
     return "";
@@ -93,19 +106,19 @@ string WorldGen::generateStructure(Biome biome, int x, int y) {
 
 string WorldGen::biomeToString(Biome biome) {
     switch (biome) {
-        case Biome::OCEAN: return "OCEAN";
-        case Biome::COAST: return "COAST";
-        case Biome::PLAINS: return "PLAINS";
-        case Biome::FOREST: return "FOREST";
-        case Biome::JUNGLE: return "JUNGLE";
-        case Biome::DESERT: return "DESERT";
-        case Biome::HILLS: return "HILLS";
-        case Biome::MOUNTAINS: return "MOUNTAINS";
-        case Biome::SWAMP: return "SWAMP";
-        case Biome::SNOWY_FOREST: return "SWAMP";
-        case Biome::SNOWY_HILLS: return "SNOWY HILLS";
-        case Biome::SNOWY_PLAINS: return "SNOWY PLAINS";
-        default: return "UNKNOWN";
+        case Biome::OCEAN:        return "OCEAN";
+        case Biome::COAST:        return "COAST";
+        case Biome::PLAINS:       return "PLAINS";
+        case Biome::FOREST:       return "FOREST";
+        case Biome::JUNGLE:       return "JUNGLE";
+        case Biome::DESERT:       return "DESERT";
+        case Biome::HILLS:        return "HILLS";
+        case Biome::MOUNTAINS:    return "MOUNTAINS";
+        case Biome::SWAMP:        return "SWAMP";
+        case Biome::SNOWY_PLAINS: return "SNOWY_PLAINS";
+        case Biome::SNOWY_FOREST: return "SNOWY_FOREST";
+        case Biome::SNOWY_HILLS:  return "SNOWY_HILLS";
+        default:                  return "UNKNOWN";
     }
 }
 
