@@ -70,7 +70,7 @@ int main() {
     try {
         // DB connection
         // reference should be passed to all methods requiring DB access
-        connection conn("host=10.10.10.4 port=3005 dbname=postgres user=postgres password=" + dbPwd);
+        connection conn("host=10.10.10.4 port=3005 dbname=consodb user=postgres password=" + dbPwd);
 
         // tests the DB connection and closes program if not available
         if (!conn.is_open()) {
