@@ -34,3 +34,5 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: secret
+            - name: WORLD_SEED
+              value: "40721690"

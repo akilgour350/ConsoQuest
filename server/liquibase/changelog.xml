@@ -18,4 +18,32 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="2" author="alastair">
+        <createTable tableName="players">
+            <column name="username" type="VARCHAR(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="xcoord" type="INT" defaultValueNumeric="0"/>
+            <column name="ycoord" type="INT" defaultValueNumeric="0"/>
+        </createTable>
+
+        <createTable tableName="tiles">
+            <column name="x" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="y" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="biome" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="structure" type="VARCHAR(50)"/>
+            <column name="structure_cleared" type="BOOLEAN" defaultValueBoolean="false"/>
+        </createTable>
+    </changeSet>
+
+
 </databaseChangeLog>

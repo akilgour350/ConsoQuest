@@ -4,10 +4,12 @@
 #include <pqxx/pqxx>
 #include "bcrypt.h"
 #include "jwt-cpp/jwt.h"
+#include "WorldGen.h"
 
 using namespace std;
 using namespace crow;
 using namespace pqxx;
+
 
 /// Generates and returns a JWT access token with the given secret and username
 auto generateJwt(string username, string jwtSecret) {
@@ -15,7 +17,7 @@ auto generateJwt(string username, string jwtSecret) {
         .set_issuer("consoquest")
         .set_subject(username)
         .set_issued_at(std::chrono::system_clock::now())
-        .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours(1))
+        .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes(10))
         .sign(jwt::algorithm::hs256{jwtSecret});
 }
 
@@ -52,11 +54,18 @@ int main() {
     }
 
     // tests to make sure we can actually retrieve the JWT secret
-    string jwtSecret = string(getenv("DB_PASSWORD"));
+    string jwtSecret = string(getenv("JWT_SECRET"));
     if (dbPwd.empty()) {
         cerr << "FATAL: Could not retrieve JWT secret" << endl;
         return 1;
     }
+
+    char* seedEnv = getenv("WORLD_SEED");
+    if (!seedEnv) {
+        cerr << "FATAL: Could not retrieve seed environment variable" << endl;
+        return 1;
+    }
+    auto worldGen = WorldGen(static_cast<int>(hash<string>{}(string(seedEnv))));
 
     try {
         // DB connection
@@ -69,10 +78,12 @@ int main() {
             return 1;
         }
 
+        // returns if the server is up and running
         CROW_ROUTE(app, "/status")([]() {
             return response(status::OK);
         });
 
+        // registers a new user with the given username and password
         CROW_ROUTE(app, "/register").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req) {
             auto body = json::load(req.body);
             if (!body)
@@ -115,24 +126,17 @@ int main() {
             }
         });
 
-        CROW_ROUTE(app, "/login")([&conn, &jwtSecret](const request& req) {
-            string auth = req.get_header_value("Authorization");
+        // logs the user in with the given username and password
+        CROW_ROUTE(app, "/login").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req) {
+            auto body = json::load(req.body);
+
+            string username = body["username"].s();
+            string password = body["password"].s();
 
             // makes sure there is actually any auth credentials found, otherwise returns 401
-            if (auth.empty()) {
-                json::wvalue response;
-                response["verified"] = false;
-                response["returning"] = "";
-
-                return crow::response(401, response);
+            if (username.empty() || password.empty()) {
+                return response(400, "Bad login request");
             }
-
-            // digs up the username and password from the base64 string
-            string creds = auth.substr(6);
-            string decoded = utility::base64decode(creds, creds.size());
-            size_t dividerPos = decoded.find(':');
-            string username = decoded.substr(0, dividerPos);
-            string password = decoded.substr(dividerPos + 1);
 
             // checks if username and password are valid and returns that the user is authorised if so
             try {
@@ -143,46 +147,91 @@ int main() {
 
                 // makes sure something was actually returned; if it was the username doesn't exist
                 if (result.empty()) {
-                    json::wvalue response;
-                    response["verified"] = false;
-                    response["message"] = "Invalid credentials";
-                    return crow::response(401, response);
+                    return response(401, "Invalid credentials");
                 }
 
                 // extracts the stored hash from the results and checks if it's valid
                 bool valid = bcrypt::validatePassword(password, result[0]["password_hash"].as<string>());
 
                 if (valid) { // if the password is correct, return that the user has been verified and return a JWT access token
-                    json::wvalue response;
-                    response["verified"] = true;
-                    response["message"] = "Success";
-                    response["token"] = generateJwt(username, jwtSecret);
-                    response["xcoord"]   = result[0]["xcoord"].as<int>();
-                    response["ycoord"]   = result[0]["ycoord"].as<int>();
+                    json::wvalue res;
+                    res["verified"] = true;
+                    res["message"] = "Success";
+                    res["token"] = generateJwt(username, jwtSecret);
+                    res["xcoord"] = result[0]["xcoord"].as<int>();
+                    res["ycoord"] = result[0]["ycoord"].as<int>();
 
-                    return crow::response(200, response);
+                    return response(200, res);
                 } else {
-                    json::wvalue response;
-                    response["verified"] = false;
-                    response["message"] = "Invalid credentials";
-                    return crow::response(500, response);
+                    return response(401, "Invalid credentials");
                 }
             } catch (exception& e) {
-                json::wvalue response;
-                response["verified"] = false;
-                response["message"] = e.what();
-                return crow::response(500, response);
+                return response(500, "Internal server error: " + string(e.what()));
             }
 
             // if we got here, the user isn't authorised and 401 is returned
             return response(401, "Invalid credentials");
         });
 
-        CROW_ROUTE(app, "/game/new")([&conn, &jwtSecret](const request& req) {
-            
+        // retrieves or generates a tile at the given X and Y coordinates
+        CROW_ROUTE(app, "/tile").methods(HTTPMethod::POST)([&conn, &jwtSecret, &worldGen](const request& req) {
+            string token = req.get_header_value("Authorization").substr(7); // checks the given JWT token is valid
 
+            if (verifyToken(token, jwtSecret)) { // only executes if the given JWT is valid
+                string username = getUsernameFromToken(token);
 
-            return response(501, "Not impelemented");
+                auto body = json::load(req.body);
+                int xcoord = static_cast<int>(body["xcoord"].i());;
+                int ycoord = static_cast<int>(body["ycoord"].i());;
+
+                work transaction(conn);
+                transaction.exec(
+                    "UPDATE players SET xcoord = $1, ycoord = $2 WHERE username = $3",
+                    params(xcoord, ycoord, username)
+                );
+                transaction.commit();
+
+                // looks to see if the tile exists in the database
+                auto dbTile = transaction.exec(
+                    "SELECT * FROM tiles WHERE x = $1 AND y = $2", params(xcoord, ycoord)
+                );
+                transaction.commit();
+
+                if (dbTile.empty()) { // checks if a matching tile was found
+                    // if no tile was found, generate a new one, store it, and send it back
+                    Tile tile = worldGen.generateTile(xcoord, ycoord);
+
+                    transaction.exec(
+                        "INSERT INTO tiles (x, y, biome, structure, structure_cleared) "
+                        "VALUES ($1, $2, $3, $4, $5)",
+                        params(xcoord, ycoord, tile.biome, tile.structure, tile.structure_cleared)
+                    );
+                    transaction.commit();
+
+                    json::wvalue res;
+                    res["x"] = xcoord;
+                    res["y"] = ycoord;
+                    res["biome"] = WorldGen::biomeToString(tile.biome);
+                    res["structure"] = tile.structure;
+                    res["structure_cleared"] = tile.structure_cleared;
+                    return response(200, res);
+
+                } else {
+                    // if a matching tile was found, just send it straight back
+                    json::wvalue res;
+                    res["x"] = xcoord;
+                    res["y"] = ycoord;
+                    res["biome"] = WorldGen::biomeToString(dbTile[0]["biome"].as<Biome>());
+                    res["structure"] = dbTile[0]["structure"].as<string>();
+                    res["structure_cleared"] = dbTile[0]["structure_cleared"].as<bool>();
+                    return response(200, res);
+                }
+
+                return response(500, "Internal error");
+
+            } else {
+                return response(403, "Invalid credentials");
+            }
         });
 
         app.port(18080).run();
