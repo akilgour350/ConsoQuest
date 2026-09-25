@@ -118,6 +118,8 @@ int main() {
 
                 json::wvalue res;
                 res["username"] = username;
+                res["x"] = 0;
+                res["y"] = 0;
                 res["token"] = generateJwt(username, jwtSecret);
                 return response(201, res);
 
@@ -158,8 +160,8 @@ int main() {
                     res["verified"] = true;
                     res["message"] = "Success";
                     res["token"] = generateJwt(username, jwtSecret);
-                    res["xcoord"] = result[0]["xcoord"].as<int>();
-                    res["ycoord"] = result[0]["ycoord"].as<int>();
+                    res["x"] = result[0]["xcoord"].as<int>();
+                    res["y"] = result[0]["ycoord"].as<int>();
 
                     return response(200, res);
                 } else {
@@ -181,12 +183,12 @@ int main() {
                 string username = getUsernameFromToken(token);
 
                 auto body = json::load(req.body);
-                int xcoord = static_cast<int>(body["xcoord"].i());
-                int ycoord = static_cast<int>(body["ycoord"].i());
+                int xcoord = static_cast<int>(body["x"].i());
+                int ycoord = static_cast<int>(body["y"].i());
 
                 work setPlayerCoordsTransaction(conn);
                 setPlayerCoordsTransaction.exec(
-                    "UPDATE players SET xcoord = $1, ycoord = $2 WHERE username = $3",
+                    "UPDATE players SET x = $1, y = $2 WHERE username = $3",
                     params(xcoord, ycoord, username)
                 );
                 setPlayerCoordsTransaction.commit();

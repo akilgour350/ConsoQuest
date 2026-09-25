@@ -92,5 +92,10 @@
             constraintName="fk_player_structure_player" />
     </changeSet>
 
+    <changeSet id="4" author="alastair">
+        <renameColumn columnDataType="INT" newColumnName="x" oldColumnName="xcoord" tableName="players" />
+        <renameColumn columnDataType="INT" newColumnName="y" oldColumnName="ycoord" tableName="players" />
+    </changeSet>
+
 
 </databaseChangeLog>
