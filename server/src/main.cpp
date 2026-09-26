@@ -120,8 +120,8 @@ int main() {
 
                 json::wvalue res;
                 res["username"] = username;
-                res["x"] = 0;
-                res["y"] = 0;
+                res["x"] = 0; //TODO: Make value randomised (probably weighted towards a village)
+                res["y"] = 0; //TODO: Make value randomised (probably weighted towards a village)
                 res["token"] = generateJwt(username, jwtSecret);
                 return response(201, res);
 
@@ -162,8 +162,8 @@ int main() {
                     res["verified"] = true;
                     res["message"] = "Success";
                     res["token"] = generateJwt(username, jwtSecret);
-                    res["x"] = result[0]["xcoord"].as<int>();
-                    res["y"] = result[0]["ycoord"].as<int>();
+                    res["x"] = result[0]["x"].as<int>();
+                    res["y"] = result[0]["y"].as<int>();
 
                     return response(200, res);
                 } else {
@@ -270,7 +270,7 @@ int main() {
             return response(403, "Invalid credentials");
         });
 #pragma endregion
-        
+
         app.port(18080).run();
 
 
