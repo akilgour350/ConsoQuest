@@ -185,7 +185,7 @@ int main() {
                 string username = getUsernameFromToken(token);
 
                 work transaction(conn);
-                auto result = transaction.exec("DELETE * FROM players WHERE username = $1", params(username)); // exterminate  ̵̄/͇̐|
+                auto result = transaction.exec("DELETE FROM players WHERE username = $1", params(username)); // exterminate  ̵̄/͇̐|
                 transaction.commit();
 
                 if (result.affected_rows() == 1) {
