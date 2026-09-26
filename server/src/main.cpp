@@ -83,6 +83,8 @@ int main() {
             return response(status::OK);
         });
 
+
+#pragma region USER MANAGEMENT
         // registers a new user with the given username and password
         CROW_ROUTE(app, "/register").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req) {
             auto body = json::load(req.body);
@@ -175,6 +177,29 @@ int main() {
             return response(401, "Invalid credentials");
         });
 
+        // deletes a user based on their username
+        CROW_ROUTE(app, "/delete").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req) {
+            string token = req.get_header_value("Authorization").substr(7);
+
+            if (verifyToken(token, jwtSecret)) { // only run if the provided token is valid
+                string username = getUsernameFromToken(token);
+
+                work transaction(conn);
+                auto result = transaction.exec("DELETE * FROM players WHERE username = $1", params(username)); // exterminate  ̵̄/͇̐|
+                transaction.commit();
+
+                if (result.affected_rows() == 1) {
+                    return response(200, "Successfully deleted user");
+                }
+
+                return response(400, "No matching users deleted");
+            }
+
+            return response(403, "Invalid credentials");
+        });
+#pragma endregion
+
+#pragma region TILES
         // retrieves or generates a tile at the given X and Y coordinates
         CROW_ROUTE(app, "/tile/get").methods(HTTPMethod::POST)([&conn, &jwtSecret, &worldGen](const request& req) {
             string token = req.get_header_value("Authorization").substr(7); // checks the given JWT token is valid
@@ -244,7 +269,8 @@ int main() {
             }
             return response(403, "Invalid credentials");
         });
-
+#pragma endregion
+        
         app.port(18080).run();
 
 
