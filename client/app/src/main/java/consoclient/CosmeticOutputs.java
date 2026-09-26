@@ -1,7 +1,11 @@
 package consoclient;
 
-/// Runs a loading animation hiding a background process
-/// Call `start` before beginning the process, then `stop` when process is complete
+import consoclient.data.Colours;
+
+import java.util.Scanner;
+
+/// Collection of various methods for providing pretty outputs to the user
+/// As many methods as possible are static.
 public class CosmeticOutputs {
     /// Thread to run the animation on
     private Thread thread;
@@ -76,6 +80,12 @@ public class CosmeticOutputs {
         System.out.println();
     }
 
+    /// Writes out a String to the console with a set delay between characters (uses default value of 30ms delay)
+    /// @param text the String to be written
+    public void typeText(String text) {
+        typeText(text, 20);
+    }
+
     /// Cleans out everything currently on the console output
     public void clearConsole() {
         System.out.print("\033[H\033[2J");
@@ -95,12 +105,29 @@ public class CosmeticOutputs {
     /// prints the game's title to the console
     /// credits to [here](https://patorjk.com/software/taag/#p=display&f=Doom&t=ConsoQuest&x=none&v=4&h=4&w=80&we=false) for the design
     public void showGameName() {
-        System.out.println(" _____                       _____                 _   ");
+        System.out.println(Colours.CYAN + " _____                       _____                 _   ");
         System.out.println("/  __ \\                     |  _  |               | |  ");
         System.out.println("| /  \\/ ___  _ __  ___  ___ | | | |_   _  ___  ___| |_ ");
         System.out.println("| |    / _ \\| '_ \\/ __|/ _ \\| | | | | | |/ _ \\/ __| __|");
         System.out.println("| \\__/\\ (_) | | | \\__ \\ (_) \\ \\/' / |_| |  __/\\__ \\ |_");
         System.out.println(" \\____/\\___/|_| |_|___/\\___/ \\_/\\_\\\\__,_|\\___||___/\\__|");
-        System.out.println("\n");
+        System.out.println("\n" + Colours.RESET);
+    }
+
+    /// builds and returns a string using the colours in the Colours class
+    /// @param toColour String to have the colour applied to
+    /// @param colour String containing the ANSI code of the desired colour
+    /// @return built string with colour applied
+    public String buildColouredString(String toColour, String colour) {
+        return colour + toColour + Colours.RESET;
+    }
+
+    public void pressToContinue(boolean clearConsole) {
+        typeText(buildColouredString("Press ENTER to continue...", Colours.GREY));
+
+        System.console().readLine();
+
+        if (clearConsole)
+            clearConsole();
     }
 }
