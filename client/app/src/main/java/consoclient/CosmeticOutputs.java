@@ -122,12 +122,23 @@ public class CosmeticOutputs {
         return colour + toColour + Colours.RESET;
     }
 
+    /// Pauses the game until the user presses the ENTER key
+    /// @param clearConsole whether the method should clear the console after the user hits ENTER
     public void pressToContinue(boolean clearConsole) {
-        typeText(buildColouredString("Press ENTER to continue...", Colours.GREY));
+        typeText(buildColouredString("Press ENTER to continue...", Colours.PURPLE));
 
         System.console().readLine();
 
         if (clearConsole)
             clearConsole();
+    }
+
+    /// Nifty method to display error messages in a uniform fashion
+    /// @param errorMsg the error message; usually the result of 'e.getMessage()'
+    public void displayError(String errorMsg) {
+        this.stop("");
+        System.out.println("Uh oh... something's gone wrong!");
+        System.out.println(buildColouredString(errorMsg, Colours.GREY));
+        pressToContinue(true);
     }
 }

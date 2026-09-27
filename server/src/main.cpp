@@ -202,7 +202,12 @@ int main() {
 #pragma region TILES
         // retrieves or generates a tile at the given X and Y coordinates
         CROW_ROUTE(app, "/tile/get").methods(HTTPMethod::POST)([&conn, &jwtSecret, &worldGen](const request& req) {
-            string token = req.get_header_value("Authorization").substr(7); // checks the given JWT token is valid
+            string token = req.get_header_value("Authorization"); // checks the given JWT token is valid
+            if (token.empty()) {
+                return response(401, "No token provided");
+            }
+
+            token = token.substr(7);
 
             if (verifyToken(token, jwtSecret)) { // only executes if the given JWT is valid
                 string username = getUsernameFromToken(token);

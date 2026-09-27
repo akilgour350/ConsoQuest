@@ -2,12 +2,12 @@ package consoclient.data;
 
 public class Player {
     public String username;
-    public int xcoord;
-    public int ycoord;
+    public int x;
+    public int y;
 
-    public Player(String username, int xcoord, int ycoord) {
+    public Player(String username, int x, int y) {
         this.username = username;
-        this.xcoord = xcoord;
-        this.ycoord = ycoord;
+        this.x = x;
+        this.y = y;
     }
 }
