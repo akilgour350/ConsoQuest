@@ -53,6 +53,20 @@ int main() {
         return 1;
     }
 
+    // tests to make sure we can actually retrieve the database host
+    char* dbHost = getenv("DB_HOST");
+    if (!dbHost) {
+        cerr << "FATAL: Could not retrieve database host environment variable" << endl;
+        return 1;
+    }
+
+    // tests to make sure we can actually retrieve the database port
+    char* dbPort = getenv("DB_PORT");
+    if (!dbPort) {
+        cerr << "FATAL: Could not retrieve database port environment variable" << endl;
+        return 1;
+    }
+
     // tests to make sure we can actually retrieve the JWT secret
     string jwtSecret = string(getenv("JWT_SECRET"));
     if (dbPwd.empty()) {
@@ -70,7 +84,7 @@ int main() {
     try {
         // DB connection
         // reference should be passed to all methods requiring DB access
-        connection conn("host=10.10.10.4 port=3005 dbname=consodb user=postgres password=" + dbPwd);
+        connection conn("host=" + dbHost +" port=" + dbPort + " dbname=consodb user=postgres password=" + dbPwd);
 
         // tests the DB connection and closes program if not available
         if (!conn.is_open()) {

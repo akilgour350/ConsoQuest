@@ -36,3 +36,7 @@ spec:
                   key: secret
             - name: WORLD_SEED
               value: "40721690"
+            - name: DB_HOST
+              value: "10.10.10.4"
+            - name: DB_PORT
+              value: "3005"
