@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        HOST_IP = '10.10.10.4'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -19,10 +23,10 @@ pipeline {
             steps {
                 sshagent(['consoquest-vm-ssh']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no root@10.10.10.4 \
+                        ssh -o StrictHostKeyChecking=no root@${HOST_IP} \
                         "cd /root/consoquest && git pull"
                         
-                        ssh -o StrictHostKeyChecking=no root@10.10.10.4 \
+                        ssh -o StrictHostKeyChecking=no root@${HOST_IP} \
                         "ansible-playbook /root/consoquest/server/ansible/deploy.yml \
                         -e build_number=${BUILD_NUMBER}"
                     '''
