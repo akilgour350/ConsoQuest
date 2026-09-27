@@ -74,6 +74,7 @@ int main() {
         return 1;
     }
 
+    // retrieves the world seed
     char* seedEnv = getenv("WORLD_SEED");
     if (!seedEnv) {
         cerr << "FATAL: Could not retrieve seed environment variable" << endl;
