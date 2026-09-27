@@ -39,7 +39,7 @@ pipeline {
         success {
             sshagent(['consoquest-vm-ssh']) {
                 sh '''
-                    ssh -o StrictHostKeyChecking=no root@10.10.10.4 \
+                    ssh -o StrictHostKeyChecking=no root@${HOST_IP} \
                     "cd /root/consoquest && git push github main"
                 '''
             }
