@@ -33,7 +33,12 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            sshagent(['consoquest-vm-ssh']) {
+                sh '''
+                    ssh -o StrictHostKeyChecking=no root@10.10.10.4 \
+                    "cd /root/consoquest && git push github main"
+                '''
+            }
         }
         failure {
             echo 'Pipeline failed!'
