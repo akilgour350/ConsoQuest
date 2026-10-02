@@ -2,13 +2,26 @@
 server/docker/.env
 
 # Ignore IDE configs
-client/.idea
-server/src/.idea
+client/Java-Console/.idea
+server/cpp/src/.idea
 .vscode
 
-# Ignore basically everything in the 
-server/src/bcrypt.h
-server/src/bcrypt.cpp
-server/src/blowfish.cpp
-server/src/jwt-cpp
-server/src/picojson
+# Ignore basically everything in C++ server src folder that isn't the main file or worldgen
+server/cpp/src/bcrypt.h
+server/cpp/src/bcrypt.cpp
+server/cpp/src/blowfish.cpp
+server/cpp/src/jwt-cpp
+server/cpp/src/picojson
+
+# React stuff
+web/react/node_modules
+web/react/logs
+web/react/*.log
+web/react/npm-debug.log*
+web/react/yarn-debug.log*
+web/react/yarn-error.log*
+web/react/pnpm-debug.log*
+web/react/lerna-debug.log*
+web/react/dist
+web/react/dist-ssr
+web/react/*.local
