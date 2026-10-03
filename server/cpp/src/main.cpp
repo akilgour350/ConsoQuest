@@ -1,6 +1,7 @@
 #include <crow/http_response.h>
 #include <string>
 #include "crow.h"
+#include "crow/middlewares/cors.h"
 #include <pqxx/pqxx>
 #include "bcrypt.h"
 #include "jwt-cpp/jwt.h"
@@ -44,7 +45,7 @@ string getUsernameFromToken(const string& token) {
 }
 
 int main() {
-    SimpleApp app;
+    App<CORSHandler> app;
 
     // tests to make sure we can actually retrieve the database password
     string dbPwd = string(getenv("DB_PASSWORD"));

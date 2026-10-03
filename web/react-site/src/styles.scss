@@ -1,0 +1,48 @@
+@use 'variables' as *;
+
+@font-face {
+    font-family: dos;
+    src: url(./assets/fonts/Good\ Old\ DOS.ttf);
+}
+
+* {
+    padding: 0px;
+    margin: 0px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+html {
+    $s: 1rem;
+    $c: $bg-primary 0 25%, $bg-secondary 0 50%, #0000 0;
+
+    background-image:
+        conic-gradient(from 180deg, $c),
+        repeating-conic-gradient(from 90deg, $c);
+    background-position: 0 0;
+    background-size: $s $s, (3 * $s) (3 * $s);
+}
+
+html,
+body {
+    margin: auto;
+    width: 90%;
+}
+
+h1, h2, h3, p {
+    color: $text;
+    font-family: dos;
+}
+
+main {
+    margin-top: 1.5rem;
+    background-color: $tertiary;
+    border-radius: $border-radius;
+    border: $border;
+    box-shadow: $shadow;
+    padding: 1rem 2rem;
+}
+
+main p {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1rem;
+}

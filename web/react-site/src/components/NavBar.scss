@@ -1,0 +1,102 @@
+@use '../variables' as *;
+
+.banner-container {
+    text-align: center;
+    background-color: $primary;
+    margin-block: 1rem 1.5rem;
+    padding: 1rem;
+    border-radius: $border-radius;
+    border: $border;
+    box-shadow: $shadow;
+    vertical-align: middle;
+}
+
+.banner-container .banner {
+    $s: 2px;
+    max-height: 10rem;
+    margin: 0.5rem;
+    font-size: 10rem;
+    font-family: dos;
+    text-shadow: calc(-1 * $s) calc(-1 * $s) 0 $text, $s calc(-1 * $s) 0 $text, calc(-1 * $s) $s 0 $text, $s $s 0 $text; color: $secondary;
+}
+
+nav {
+    padding-block: 1rem;
+    padding-inline: 1rem;
+    text-align: center;
+    background-color: $secondary;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    border: $border;
+}
+
+nav a {
+    font-size: 2rem;
+    margin-inline: 1rem;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: bold;
+    font-family: dos;
+}
+
+nav a:hover {
+    color: $primary;
+}
+
+.flexbox {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    row-gap: 1.5rem;
+    column-gap: 3.75rem;
+    text-align: left;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.content-wrapper {
+    flex: 70%;
+}
+
+.sidebar {
+    flex: 25%;
+    max-width: 30%;
+}
+
+.ssi {
+    background-color: $tertiary;
+    width: 100%;    
+    border: $border;
+    box-shadow: $shadow;
+    border-radius: $border-radius;
+    padding: 1rem;
+    text-align: center;
+}
+
+.ssi h3 {
+    margin-block: 1rem;
+}
+
+.ssi h2 {
+    color: darkred;
+}
+
+.quicklinks {
+    margin-top: 1.5rem;
+    text-align: left;
+    width: 100%;
+    padding-left: 2rem;
+}
+
+.quicklinks li {
+    margin-bottom: .25rem;
+}
+
+.quicklinks a {
+    font-family: dos;
+    color: $secondary;
+}
+
+.quicklinks a:hover {
+    color: $primary;
+}

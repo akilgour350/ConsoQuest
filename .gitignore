@@ -14,14 +14,14 @@ server/cpp/src/jwt-cpp
 server/cpp/src/picojson
 
 # React stuff
-web/react/node_modules
-web/react/logs
-web/react/*.log
-web/react/npm-debug.log*
-web/react/yarn-debug.log*
-web/react/yarn-error.log*
-web/react/pnpm-debug.log*
-web/react/lerna-debug.log*
-web/react/dist
-web/react/dist-ssr
-web/react/*.local
+web/react-site/node_modules
+web/react-site/logs
+web/react-site/*.log
+web/react-site/npm-debug.log*
+web/react-site/yarn-debug.log*
+web/react-site/yarn-error.log*
+web/react-site/pnpm-debug.log*
+web/react-site/lerna-debug.log*
+web/react-site/dist
+web/react-site/dist-ssr
+web/react-site/*.local
