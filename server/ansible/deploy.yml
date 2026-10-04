@@ -66,3 +66,19 @@
       fail:
         msg: "Deployment failed and was rolled back."
       when: rollout_result is failed
+
+    - name: Build React site's Docker image
+      command: >
+        docker build -t consoquest-react:latest
+        {{ repo_path }}/web/react-site
+
+    - name: Import React image into Kubernetes
+      shell: >
+        docker save consoquest-react:latest |
+        k3s ctr images import -
+
+    - name: Apply React Kubernetes manifests
+      shell: k3s kubectl apply -f {{ repo_path }}/web/react-site/k3s/
+
+    - name: Restart React deployment
+      shell: k3s kubectl rollout restart deployment/consoquest-react

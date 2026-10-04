@@ -58,11 +58,13 @@ nav a:hover {
     flex: 70%;
 }
 
+
 .sidebar {
     flex: 25%;
     max-width: 30%;
 }
 
+/* server status side panel */ 
 .ssi {
     background-color: $tertiary;
     width: 100%;    
@@ -73,14 +75,36 @@ nav a:hover {
     text-align: center;
 }
 
-.ssi h3 {
-    margin-block: 1rem;
+.ssi h1 {
+    margin-top: 1rem;
 }
 
-.ssi h2 {
-    color: darkred;
+.ssi .offline {
+    color: $failure;
 }
 
+.ssi .checking {
+    color: $pending;
+}
+
+.ssi .checking::after {
+    content: ' ';
+    animation: checkingserver 1.5s infinite;
+}
+
+@keyframes checkingserver {
+    0% { content: ' '; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+}
+
+.ssi .online {
+    color: $success;
+}
+
+
+/* QuickLinks side panel */
 .quicklinks {
     margin-top: 1.5rem;
     text-align: left;

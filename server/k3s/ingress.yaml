@@ -17,3 +17,10 @@ spec:
                 name: consoquest-api
                 port:
                   number: 80
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: consoquest-react
+                port:
+                  number: 80

@@ -20,14 +20,13 @@ const ServerStatusIndicator: React.FC = () => {
 
     useEffect(() => {
         checkServerStatus().then(setStatus);
-    }, []); // empty array = run once when the component mounts
+    }, []);
 
     return (
         <>
             <div className="ssi">
-                <h1>Server Status</h1>
-                <h3>conso.akilgour.com is</h3>
-                <h2>{status}</h2>
+                <h2>Server Status</h2>
+                <h1 className={status}>{status}</h1>
             </div>
         </>
     )

@@ -17,6 +17,7 @@ pipeline {
             when {
                 anyOf {
                     changeset "server/**"
+                    changeset "web/**"
                     changeset "Jenkinsfile"
                 }
             }

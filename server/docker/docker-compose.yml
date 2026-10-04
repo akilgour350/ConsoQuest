@@ -9,5 +9,14 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
 
+  react:
+    build:
+      context: /root/consoquest/web/react-site
+      dockerfile: Dockerfile
+    container_name: consoquest-react
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
 volumes:
   pgdata:
