@@ -8,6 +8,13 @@ spec:
     - host: conso.akilgour.com
       http:
         paths:
+          - path: /assets
+            pathType: Prefix
+            backend:
+              service:
+                name: consoquest-react
+                port:
+                  number: 80
           - path: /
             pathType: Prefix
             backend:
