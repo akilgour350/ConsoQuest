@@ -22,7 +22,7 @@ auto generateJwt(string username, string jwtSecret) {
         .sign(jwt::algorithm::hs256{jwtSecret});
 }
 
-/// Checks if a given JWT token is valid
+/// Checks if a given JWT token is valid 
 bool verifyToken(const string& token, const string& secret) {
     try {
         auto decoded = jwt::decode<jwt::traits::kazuho_picojson>(token);
