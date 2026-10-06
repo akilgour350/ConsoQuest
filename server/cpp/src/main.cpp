@@ -214,7 +214,7 @@ int main() {
         });
 
         // gets a user's details using an existing JWT token (MAKE SURE TOKENS ARE WELL GUARDED!!!!!!!!!)
-        CROW_ROUTE(app, "/me").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req)) {
+        CROW_ROUTE(app, "/me").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req) {
             string token = req.get_header_value("Authorization").substr(7);
 
             if (verifyToken(token, jwtSecret)) {
@@ -236,7 +236,7 @@ int main() {
             }
 
             return response(403, "Invalid credentials");
-        }
+        });
 #pragma endregion
 
 #pragma region TILES
