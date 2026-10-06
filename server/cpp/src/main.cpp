@@ -1,3 +1,4 @@
+#include <crow/common.h>
 #include <crow/http_response.h>
 #include <string>
 #include "crow.h"
@@ -211,6 +212,31 @@ int main() {
 
             return response(403, "Invalid credentials");
         });
+
+        // gets a user's details using an existing JWT token (MAKE SURE TOKENS ARE WELL GUARDED!!!!!!!!!)
+        CROW_ROUTE(app, "/me").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req)) {
+            string token = req.get_header_value("Authorization").substr(7);
+
+            if (verifyToken(token, jwtSecret)) {
+                string username = getUsernameFromToken(token);
+                work transaction(conn);
+                auto result = transaction.exec("SELECT * FROM players WHERE username = $1", params(username));
+
+                if (sizeof(result) > 0) { // check there was a user actually found with this username
+                    json::wvalue res;
+                    res["token"] = generateJwt(username, jwtSecret); // generates a new token
+                    res["x"] = result[0]["x"].as<int>();
+                    res["y"] = result[0]["y"].as<int>();
+                    res["username"] = result[0]["username"].as<string>();
+
+                    return response(200, res);
+                } else {
+                    return response(401, "Invalid username");
+                }
+            }
+
+            return response(403, "Invalid credentials");
+        }
 #pragma endregion
 
 #pragma region TILES
