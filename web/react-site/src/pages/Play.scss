@@ -42,6 +42,25 @@ form a {
     font-size: 1rem;
 }
 
+.loading {
+    color: $pending;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+
+.loading::after {
+    content: ' ';
+    animation: checkingserver 1.5s infinite;
+}
+
+@keyframes checkingserver {
+    0% { content: ' '; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+}
+
 .error {
     color: $failure;
 }

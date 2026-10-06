@@ -33,29 +33,37 @@ function Play() {
       return;
     }
 
-      if (await game.register(uname, pwd)) {
-        console.log("SUCCESS!");
-      } else {
-        console.log("FAILURE");
-        setError("Could not register user! Try a different username!");
-      }
+    if (await game.register(uname, pwd)) {
+      console.log("SUCCESS!");
+    } else {
+      console.log("FAILURE");
+      setError("Could not register user! Try a different username!");
+    }
   }
 
   useEffect(() => {
-        game.restore().then(ok => {
-            setLoggedIn(ok);
-            setChecking(false);
-        });
-    }, []);
+    game.restore().then(ok => {
+      setLoggedIn(ok);
+      setChecking(false);
+    });
+  }, []);
 
-  if (checking) return <p>Loading...</p>;
+  if (checking) {
+    return (
+      <>
+        <h1> == Play == </h1>
+        <h2 className="loading">Loading</h2>
+      </>
+    )
+
+  }
 
   return (
     <>
       <h1> == Play == </h1>
 
       {
-        !loggedIn ? (      
+        !loggedIn ? (
           currentForm === "login" ? (
             <form id="loginForm" action={login}>
               <h2>Log In</h2>
@@ -72,28 +80,28 @@ function Play() {
             </form>
           )
             :
-          (
-            <form id="register" action={register}>
-              <h2>Register</h2>
+            (
+              <form id="register" action={register}>
+                <h2>Register</h2>
 
-              <input name="username" id="username" placeholder="Username" required />
+                <input name="username" id="username" placeholder="Username" required />
 
-              <br />
-              <input name="password" id="password" type="password" placeholder="Password" required />
+                <br />
+                <input name="password" id="password" type="password" placeholder="Password" required />
 
-              <br />
-              <input name="password-confirm" id="password-confirm" type="password" placeholder="Confirm password" required />
+                <br />
+                <input name="password-confirm" id="password-confirm" type="password" placeholder="Confirm password" required />
 
-              <br />
-              <button type="submit">Register</button><br />
-              {error && <p className="error">{error}</p>}
-              <a onClick={() => setCurrentForm("login")}>Have an account?</a>
-            </form>
-          )
+                <br />
+                <button type="submit">Register</button><br />
+                {error && <p className="error">{error}</p>}
+                <a onClick={() => setCurrentForm("login")}>Have an account?</a>
+              </form>
+            )
         ) :
-        (
-          <h1>ALREADY LOGGED IN</h1>
-        )
+          (
+            <h1>ALREADY LOGGED IN</h1>
+          )
       }
 
     </>

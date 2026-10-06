@@ -18,7 +18,7 @@ export class GameSession {
                 // sends the login request to the API
                 const response = await fetch('https://conso.akilgour.com/api/restore', {
                     method: 'POST',
-                    headers: { 'Authorization': 'Bearer ', token }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) { // returns if request failed
