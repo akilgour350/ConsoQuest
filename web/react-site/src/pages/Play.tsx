@@ -3,8 +3,6 @@ import './Play.scss'
 import { GameSession } from '../GameSession';
 import { useEffect, useState } from 'react';
 
-type AuthStatus = "Loading" | "loggedIn" | "loggedOut";
-
 function Play() {
   const [game] = useState(() => new GameSession());
   const [loggedIn, setLoggedIn] = useState(game.loggedIn);
