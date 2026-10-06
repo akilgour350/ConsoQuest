@@ -1,4 +1,4 @@
-import "./NavBar.scss"
+import "./Components.scss"
 import { useEffect, useState } from "react"
 
 type Status = "checking" | "online" | "offline";

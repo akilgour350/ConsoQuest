@@ -1,4 +1,4 @@
-import "./NavBar.scss"
+import "./Components.scss"
 import { NavLink } from "react-router"
 
 

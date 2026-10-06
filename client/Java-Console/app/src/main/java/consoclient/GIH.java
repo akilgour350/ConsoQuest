@@ -188,7 +188,7 @@ public class GIH {
         String body = String.format("{ \"x\": \"%s\", \"y\": \"%s\" }", PLAYER.x, PLAYER.y); // builds the JSON body of the request
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(SERVER_URL + "/tile/get")) // sets the request URI
+                .uri(URI.create(SERVER_URL + "/tile")) // sets the request URI
                 .header("Authorization", "Bearer " + TOKEN) // defines the content type as JSON
                 .POST(HttpRequest.BodyPublishers.ofString(body)) // set request type (POST)
                 .build();

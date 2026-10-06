@@ -175,8 +175,6 @@ int main() {
 
                 if (valid) { // if the password is correct, return that the user has been verified and return a JWT access token
                     json::wvalue res;
-                    res["verified"] = true;
-                    res["message"] = "Success";
                     res["token"] = generateJwt(username, jwtSecret);
                     res["x"] = result[0]["x"].as<int>();
                     res["y"] = result[0]["y"].as<int>();
@@ -217,7 +215,7 @@ int main() {
 
 #pragma region TILES
         // retrieves or generates a tile at the given X and Y coordinates
-        CROW_ROUTE(app, "/tile/get").methods(HTTPMethod::POST)([&conn, &jwtSecret, &worldGen](const request& req) {
+        CROW_ROUTE(app, "/tile").methods(HTTPMethod::POST)([&conn, &jwtSecret, &worldGen](const request& req) {
             string token = req.get_header_value("Authorization"); // checks the given JWT token is valid
             if (token.empty()) {
                 return response(401, "No token provided");

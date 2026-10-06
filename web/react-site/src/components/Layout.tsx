@@ -1,7 +1,7 @@
 import { Outlet } from "react-router"
 import NavBar from "./NavBar.tsx"
 import SSI from "./ServerStatusIndicator.tsx"
-import "./NavBar.scss"
+import "./Components.scss"
 import QuickLinks from "./QuickLinks.tsx"
 
 const Layout: React.FC = () => {

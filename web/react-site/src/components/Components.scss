@@ -13,9 +13,8 @@
 
 .banner-container .banner {
     $s: 2px;
-    max-height: 10rem;
     margin: 0.5rem;
-    font-size: 10rem;
+    font-size: 8vw;
     font-family: dos;
     text-shadow: calc(-1 * $s) calc(-1 * $s) 0 $text, $s calc(-1 * $s) 0 $text, calc(-1 * $s) $s 0 $text, $s $s 0 $text; color: $secondary;
 }

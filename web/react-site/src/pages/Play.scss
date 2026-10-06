@@ -1,0 +1,47 @@
+@use '../variables' as *;
+
+form {
+    margin: auto;
+    text-align: center;
+}
+
+form label, form input, form button {
+    font-family: monospace;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+form input {
+    background-color: $bg-primary;
+    padding: 4px;
+}
+
+form h2 {
+    margin-bottom: 0.5rem;
+}
+
+form button {
+    $bt: 4px;
+
+    padding: 4px 1rem;
+    cursor: pointer;
+    border-radius: 0;
+    border: 1px $text outset;
+    border-bottom: $bt outset $text;
+    border-right: $bt outset $text;
+    width: clamp(10rem, 20rem, 30vw);
+    background-color: $bg-secondary;
+}
+
+form button:hover {
+    background-color: $bg-primary;
+}
+
+form a {
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.error {
+    color: $failure;
+}
