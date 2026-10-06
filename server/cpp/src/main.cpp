@@ -50,9 +50,9 @@ int main() {
 
     auto& cors = app.get_middleware<crow::CORSHandler>();
     cors.global()
-        .origin("*")
-        .methods("GET"_method, "POST"_method)
-        .headers("Content-Type", "Authorization");
+      .origin("*")
+      .methods("GET"_method, "POST"_method, "OPTIONS"_method)
+      .headers("Content-Type", "Authorization");
 
     // tests to make sure we can actually retrieve the database password
     string dbPwd = string(getenv("DB_PASSWORD"));
