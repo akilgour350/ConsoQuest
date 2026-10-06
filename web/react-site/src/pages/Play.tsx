@@ -1,14 +1,16 @@
 import '../styles.scss'
 import './Play.scss'
 import { GameSession } from '../GameSession';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+type AuthStatus = "Loading" | "loggedIn" | "loggedOut";
 
 function Play() {
   const [game] = useState(() => new GameSession());
   const [loggedIn, setLoggedIn] = useState(game.loggedIn);
+  const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
   const [currentForm, setCurrentForm] = useState<"login" | "register">("login"); // used to figure out whether to show login or register forms
-
 
   async function login(formData: FormData) {
     const uname = formData.get("username") as string;
@@ -40,6 +42,15 @@ function Play() {
         setError("Could not register user! Try a different username!");
       }
   }
+
+  useEffect(() => {
+        game.restore().then(ok => {
+            setLoggedIn(ok);
+            setChecking(false);
+        });
+    }, []);
+
+  if (checking) return <p>Loading...</p>;
 
   return (
     <>

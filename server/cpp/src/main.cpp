@@ -48,6 +48,12 @@ string getUsernameFromToken(const string& token) {
 int main() {
     App<CORSHandler> app;
 
+    auto& cors = app.get_middleware<crow::CORSHandler>();
+    cors.global()
+        .origin("*")
+        .methods("GET"_method, "POST"_method)
+        .headers("Content-Type", "Authorization");
+
     // tests to make sure we can actually retrieve the database password
     string dbPwd = string(getenv("DB_PASSWORD"));
     if (dbPwd.empty()) {
@@ -213,8 +219,8 @@ int main() {
             return response(403, "Invalid credentials");
         });
 
-        // gets a user's details using an existing JWT token (MAKE SURE TOKENS ARE WELL GUARDED!!!!!!!!!)
-        CROW_ROUTE(app, "/me").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req) {
+        // restores a user's session based on a given JWT token (KEEP THE TOKENS SAFE!!!!!)
+        CROW_ROUTE(app, "/restore").methods(HTTPMethod::POST)([&conn, &jwtSecret](const request& req) {
             string token = req.get_header_value("Authorization").substr(7);
 
             if (verifyToken(token, jwtSecret)) {
