@@ -4,7 +4,7 @@ RUN mkdir node
 COPY . ./node
 WORKDIR ./node/
 
-RUN npm install express
+RUN npm install express pg
 
 EXPOSE 18080
 
