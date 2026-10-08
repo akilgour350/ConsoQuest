@@ -10,10 +10,8 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD
 });
 
-async function runQuery(query) {
+export async function runQuery(query) {
     console.log('Running query...');
     console.log('SELECT * FROM players WHERE username = $1', username);
     return await pool.query(query);    
 }
-
-exports.runQuery = runQuery;
