@@ -8,4 +8,4 @@ RUN npm install express
 
 EXPOSE 18080
 
-CMD node app.js
+CMD node main.js
