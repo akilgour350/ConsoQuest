@@ -25,3 +25,6 @@ web/react-site/lerna-debug.log*
 web/react-site/dist
 web/react-site/dist-ssr
 web/react-site/*.local
+
+# Node.JS
+server/node/node_modules
