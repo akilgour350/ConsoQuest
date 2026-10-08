@@ -9,7 +9,7 @@ app.get('/', (req, res) => {
 
 app.get('/status', (req, res) => {
     console.log('Received request in /status!');
-    res.status(200);
+    res.sendStatus(200);
 });
 
 const PORT = 18080;
