@@ -19,7 +19,7 @@ app.post('/login', (req, res) => {
     }
 
     try {
-        const result = runQuery('SELECT * FROM players WHERE username = $1', username).then(() => console.log('Query complete!'));
+        const result = runQuery('SELECT * FROM players WHERE username = ' + username).then(() => console.log('Query complete!'));
         console.log(result);
     } catch (error) {
         res.status(500).send(error);
