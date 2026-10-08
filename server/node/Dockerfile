@@ -8,4 +8,4 @@ RUN npm install express pg
 
 EXPOSE 18080
 
-CMD node main.js
+CMD node main.cjs
