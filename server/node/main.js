@@ -8,6 +8,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/status', (req, res) => {
+    console.log('Received request in /status!');
     res.status(200);
 });
 
