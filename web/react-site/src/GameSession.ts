@@ -11,7 +11,7 @@ export class GameSession {
     y: number = 0;
     loggedIn: boolean = false;
 
-    async restore(): Promise<boolean> {
+    async restore(): Promise<string | null> {
         try {
             const token: string | null = sessionStorage.getItem("cq-token");
             if (token !== null) {
@@ -22,7 +22,7 @@ export class GameSession {
                 });
 
                 if (!response.ok) { // returns if request failed
-                    return false;
+                    return await response.text();
                 }
 
                 const data: LoginResponse = await response.json(); // parses returned JSON to LoginResponse interface
@@ -34,19 +34,19 @@ export class GameSession {
 
                 sessionStorage.setItem("cq-token", data.token); // stores the JWT token in session storage
 
-                return true; // indicate that login was a success
+                return null; // indicate that login was a success
 
             }
 
-            return false;
+            return "Your current session has expired!";
         } catch (error) {
             console.error("[ERROR] Session restore failed: ", error);
-            return false;
+            return "An error occurred - check the console for details!";
         }
     }
 
     // logs the user in with the given username and password
-    async login(uname: string, pwd: string): Promise<boolean> {
+    async login(uname: string, pwd: string): Promise<string | null> {
         try {
             // sends the login request to the API
             const response = await fetch('https://conso.akilgour.com/api/login', {
@@ -56,7 +56,7 @@ export class GameSession {
             });
 
             if (!response.ok) { // returns if request failed
-                return false;
+                return await response.text();
             }
 
             const data: LoginResponse = await response.json(); // parses returned JSON to LoginResponse interface
@@ -68,16 +68,16 @@ export class GameSession {
 
             sessionStorage.setItem("cq-token", data.token); // stores the JWT token in session storage
 
-            return true; // indicate that login was a success
+            return null; // indicate that login was a success
 
         } catch (error) {
             console.error("[ERROR] Login failed: ", error);
-            return false;
+            return "An error occurred - check the console for details!";
         }
     }
 
     // registers the user in with the given username and password
-    async register(uname: string, pwd: string): Promise<boolean> {
+    async register(uname: string, pwd: string): Promise<string | null> {
         try {
             // sends the login request to the API
             const response = await fetch('https://conso.akilgour.com/api/register', {
@@ -87,7 +87,7 @@ export class GameSession {
             });
 
             if (!response.ok) { // returns if request failed
-                return false;
+                return await response.text();
             }
 
             const data: LoginResponse = await response.json(); // parses returned JSON to LoginResponse interface
@@ -99,11 +99,11 @@ export class GameSession {
 
             sessionStorage.setItem("cq-token", data.token);  // stores the JWT token in session storage
 
-            return true; // indicate that login was a success
+            return null; // indicate that login was a success
 
         } catch (error) {
             console.error("[ERROR] Registration failed: ", error);
-            return false;
+            return "An error occurred - check the console for details!";
         }
     }
 }

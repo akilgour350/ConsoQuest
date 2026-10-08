@@ -64,3 +64,17 @@ form a {
 .error {
     color: $failure;
 }
+
+.play-stage {
+    background-color: black;
+    width: 97%;
+    height: 40rem;
+    font-family: monospace;
+    color: white;
+    padding: 0.5rem;
+    margin-inline: auto;
+}
+
+.play-stage * {
+    color: white;
+}

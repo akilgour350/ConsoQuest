@@ -14,12 +14,13 @@ function Play() {
     const uname = formData.get("username") as string;
     const pwd = formData.get("password") as string;
 
-    if (await game.login(uname, pwd)) {
+    const result: string | null = await game.login(uname, pwd);
+    if (result === null) {
       console.log("SUCCESS!");
       setLoggedIn(true);
     } else {
       console.log("FAILURE");
-      setError("Invalid username or password!");
+      setError(result);
     }
   }
 
@@ -33,17 +34,18 @@ function Play() {
       return;
     }
 
-    if (await game.register(uname, pwd)) {
+    const result: string | null = await game.register(uname, pwd);
+    if (result === null) {
       console.log("SUCCESS!");
     } else {
       console.log("FAILURE");
-      setError("Could not register user! Try a different username!");
+      setError(result);
     }
   }
 
   useEffect(() => {
     game.restore().then(ok => {
-      setLoggedIn(ok);
+      setLoggedIn(ok === null);
       setChecking(false);
     });
   }, []);
@@ -100,7 +102,9 @@ function Play() {
             )
         ) :
           (
-            <h1>ALREADY LOGGED IN</h1>
+            <div className="play-stage">
+              <p>Pick an option to start!</p>
+            </div>
           )
       }
 
