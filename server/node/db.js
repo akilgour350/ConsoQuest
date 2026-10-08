@@ -12,6 +12,6 @@ const pool = new Pool({
 
 export async function runQuery(query) {
     console.log('Running query...');
-    console.log('SELECT * FROM players WHERE username = $1', username);
+    console.log(query);
     return await pool.query(query);    
 }
